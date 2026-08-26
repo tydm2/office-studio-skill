@@ -65,7 +65,7 @@
 | rafalozan0/DocFlow | https://github.com/rafalozan0/DocFlow-Presentations-and-Docs-Skill | python-docx 模板化生成 | 通过（同上） |
 
 ## 自我迭代协议
-（机制同 orchestrator：`references/feedback-log.md` 需求记忆 + `references/usage-log.md` 使用留痕，TRIGGER MISS/EXEC POOR 强制 5-Why；用户说「优化/迭代 word-crafter」时按 feedback-log 未消费需求+usage-log 最近 10 条产出改进清单→确认→修订本文件→复测→标记 consumed。迭代冻结 `name` 与触发词。）
+（机制同 orchestrator：`references/feedback-log.md` 需求记忆 + `references/usage-log.md` 使用留痕，TRIGGER MISS/EXEC POOR 强制 5-Why；用户说「优化/迭代 word-crafter」时按 feedback-log 未消费需求+usage-log 最近 10 条产出改进清单→确认→修订本文件→复测→标记 consumed。迭代冻结 `name` 与触发词。）省 token 纪律/审计/归档见 `../../shared/memory-lean-protocol.md`。
 
 ## 下游交接（流水线）
 本智能体产出 `outputs/word/doc-NN.docx`，为最终交付物（Word 类文档无下游专家）：

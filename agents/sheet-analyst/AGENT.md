@@ -58,7 +58,7 @@
 | rafalozan0/DocFlow | https://github.com/rafalozan0/DocFlow-Presentations-and-Docs-Skill | openpyxl 模板化生成、交付校验 | 通过（同上） |
 
 ## 自我迭代协议
-（机制同 orchestrator：`references/feedback-log.md` + `references/usage-log.md`，TRIGGER MISS/EXEC POOR 强制 5-Why；用户说「优化/迭代 sheet-analyst」时按未消费需求+最近 10 条产出改进清单→确认→修订本文件→复测→标记 consumed。迭代冻结 `name` 与触发词。）
+（机制同 orchestrator：`references/feedback-log.md` + `references/usage-log.md`，TRIGGER MISS/EXEC POOR 强制 5-Why；用户说「优化/迭代 sheet-analyst」时按未消费需求+最近 10 条产出改进清单→确认→修订本文件→复测→标记 consumed。迭代冻结 `name` 与触发词。）省 token 纪律/审计/归档见 `../../shared/memory-lean-protocol.md`。
 
 ## 下游交接（流水线）
 本智能体产出 `outputs/excel/sheet-NN.xlsx`，为最终交付物（Excel 类无下游专家）：

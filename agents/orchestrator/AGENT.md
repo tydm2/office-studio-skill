@@ -71,6 +71,7 @@
 | `../shared/style-switcher.md` | 风格选择器 + 换一轮协议 | 内置 |
 | `../shared/brand-kit.md` | 品牌套件（跨文档品牌统一，v2） | 内置 |
 | `../shared/format-matrix.md` | 文档格式生成矩阵（docx/pptx/xlsx/pdf/md/html + 环境降级） | 刷新 |
+| `../shared/memory-lean-protocol.md` | 省 Token 记忆协议（feedback-log/usage-log 纪律·审计·归档 + 轻量图谱，v1.7） | 内置 |
 
 ## 社区来源
 本智能体的设计参考了以下社区方案，精华已提炼入 `knowledge/community-refs.md`：
@@ -85,6 +86,7 @@
 2. **使用留痕**：`references/usage-log.md` 追加式记录 TRIGGER OK / TRIGGER MISS（记疑似原因）/ LOAD FAIL / EXEC POOR（记问题与用户反应）。TRIGGER MISS 与 EXEC POOR 强制升级为 5-Why 复盘。
 3. **何时迭代**：用户说「优化/迭代 orchestrator」时，读 feedback-log 未消费需求 + usage-log 最近 10 条，产出改进清单→用户确认→修订本 AGENT.md→复测→标记 consumed。
 4. **契约冻结**：迭代时冻结 `name`（orchestrator）与触发词，description 可修订但须保持触发契约。
+5. **省 token（v1.7）**：feedback-log/usage-log 平时不读取（0 注入），仅迭代时全量读；迭代前按 `../shared/memory-lean-protocol.md` 审计上下文成本（目标指令链 ≤8k token）、先收敛重复再动手；活跃需求 >50 条归档。
 
 ## 下游交接（流水线）
 本智能体产出 `outputs/plans/plan-NN.md`，是 word-crafter / slide-designer / sheet-analyst 的输入：
