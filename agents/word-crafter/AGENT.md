@@ -19,10 +19,10 @@
 当用户说「撰写Word / 写正文 / 生成Word / 改Word / 修改文档 / 编辑这份Word」，或 orchestrator 派发 word 任务时：
 
 1. **前置条件**：必须存在已确认的 `outputs/plans/plan-NN.md`（新建，doc_type=word）**或** `outputs/plans/edit-NN.md`（编辑，含 source_file）；缺失时提示先跑 orchestrator。
-2. **读取清单**：读本目录全部文件 + `../shared/style-catalog.md` + plan/edit 文件。
+2. **读取清单**：读本目录全部文件 + `../shared/style-catalog.md` + plan/edit 文件；**plan 含 `brand_kit` 时另读 `../shared/brand-kit.md`，品牌资产优先于风格库**。
 3. **编辑模式**（存在 source_file 时）：先用 python-docx 读取原文件结构与样式（段落、标题层级、字体、页边距），在**原文上增量修改**：只改 change_request 指定内容，保留 keep 项与原有风格，除非用户明确要求改变。
 4. **组装 prompt**：把上述内容拼成**自包含**派发提示词，按 `prompt-craft` 七段式（身份/任务/输入/方法/输出/红线/失败处理），用 `subagent` 工具（后台运行）派发给小组。提示词须包含：小组协商机制、所选 `style_id` 的完整规格（编辑模式默认沿用原风格）、输出模板、质检清单。
-5. **产出**：用 `python-docx` 生成/改写 `outputs/word/doc-NN.docx`（编辑模式 NN 递增、**不覆盖原文件**），另写 `outputs/word/doc-NN-meta.md`（doc_id/style_id/生成日期/改动说明，编辑模式须含逐条改动清单）。交付前校验文件可打开、样式无损坏。
+5. **产出**：用 `python-docx` 生成/改写 `outputs/word/doc-NN.docx`（编辑模式 NN 递增、**不覆盖原文件**），另写 `outputs/word/doc-NN-meta.md`（doc_id/style_id/**brand_kit(若有)**/生成日期/改动说明，编辑模式须含逐条改动清单）。**启用品牌套件时按 `brand-kit.md` 应用品牌色/字体/页眉页脚/Logo，meta 记录使用到的品牌资产项**。交付前校验文件可打开、样式无损坏。
 6. **迭代**：用户提修改意见，用 DSH `send_message` 让同一子代理续聊修订；修订写进 `-meta.md` 改动说明。
 
 ## 输入
@@ -39,12 +39,13 @@
 - [ ] 结构按 `knowledge/craft-methodology.md` 方法论组织（金字塔/并列/递进清晰）
 - [ ] 语言无 AI 腔套话、无模糊量词（禁词清单见 quality-checklist）
 - [ ] 数据、单位、图表与正文一致，无虚构
-- [ ] 版式符合 `style_id`（配色/字体/标题层级/行距）
+- [ ] 版式符合 `style_id`（配色/字体/标题层级/行距）；**启用品牌套件时符合 brand-kit 规则（品牌色/字体/页眉页脚/Logo 一致）**
 - [ ] 学术/公文场景符合对应规范（编号、参考文献、公文格式）
 - [ ] .docx 能正常打开，标题层级与样式正确应用
 - [ ] 篇幅符合 plan 的 length 要求（偏差 ≤10%）
 - [ ] 编辑模式：只改 change_request 指定内容，keep 项与原样式未被改写
 - [ ] 编辑模式：改动逐条记录进 -meta.md，原文件未被覆盖
+- [ ] 品牌套件：meta.md 已记录 brand_kit 与使用到的品牌资产项
 
 ## 内置知识库索引
 | 文件 | 内容 | 类型 |
@@ -55,6 +56,7 @@
 | `knowledge/output-template.md` | 输出结构与模板 | 内置 |
 | `knowledge/community-refs.md` | 社区调研精华 | 内置 |
 | `../../shared/style-catalog.md` | 风格库 | 刷新 |
+| `../../shared/brand-kit.md` | 品牌套件（有 brand_kit 时读取） | 内置 |
 
 ## 社区来源
 | 来源 | 链接 | 借鉴点 | 审查结论 |

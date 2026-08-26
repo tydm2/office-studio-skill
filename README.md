@@ -54,6 +54,7 @@ office-studio/
   shared/
     style-catalog.md             # 刷新型风格库（14 种风格：6 经典 + 8 社区借鉴，多风格切换核心）
     style-switcher.md            # 风格选择器 + 不满意换一轮协议
+    brand-kit.md                 # ★品牌套件（v2）：跨文档品牌统一——同一客户的 Word/PPT/Excel 共用品牌色/字体/Logo/页眉页脚
   blueprints/
     办公文档.md                    # 领域拓扑沉淀（复用与决策记录，v1.6 机制）
   feedback-log.md                # 工作流级需求记忆（运行期迭代用）
@@ -69,7 +70,8 @@ office-studio/
       references/
     slide-designer/              # PPT 设计专家（专家小组制）
       AGENT.md
-      knowledge/                 # narrative-methodology / style-application / quality-checklist / output-template / community-refs
+      knowledge/                 # narrative-methodology / style-application / quality-checklist / output-template / community-refs / visual-qa / plugin-ecosystem
+      scripts/visual-qa.py       # 视觉审稿质检脚本（溢出/重叠/对比度/越界/字体）
       references/
     sheet-analyst/               # Excel 报表专家（单一资深专家）
       AGENT.md
@@ -91,6 +93,7 @@ office-studio/
    title: <标题>
    doc_type: word | ppt | excel
    style_id: <见 shared/style-catalog.md，14 种：6 经典 + 8 社区借鉴；选择器见 shared/style-switcher.md>
+   brand_kit: <可选，用户提供品牌资产时写 brand-NN，规则见 shared/brand-kit.md；无则省略>
    audience: <受众>
    purpose: <用途>
    length: <篇幅>
@@ -109,8 +112,9 @@ office-studio/
    style_id: <默认沿用原风格；换风格需用户明确指定>
    ---
    ```
-2. **各专家产出**：`outputs/<type>/<文件名>`，并附带同名 `-meta.md`（记录：doc_id、style_id、生成日期、数据来源、改动说明）。
+2. **各专家产出**：`outputs/<type>/<文件名>`，并附带同名 `-meta.md`（记录：doc_id、style_id、**brand_kit（若有）**、生成日期、数据来源、改动说明）。
 3. **迭代**：用户修改意见一律通过 DSH `send_message` 给原子代理续聊修订，保留上下文；修订必须写进 `-meta.md` 的「改动说明」，不静默重写已确认内容。
+4. **品牌套件（v2）**：用户提供品牌资产（品牌色/Logo/字体/模板）→ orchestrator 收集进 `shared/brand-kit.md`，plan 写 `brand_kit: brand-NN`，三专家统一套用（品牌优先于风格库）；同一 brand_id 多件套交付时 orchestrator 核对品牌一致性（见 `shared/brand-kit.md`）。
 
 ## 五、社区先例致谢（设计参考）
 
@@ -133,7 +137,7 @@ office-studio/
 
 ## 六、首跑指令
 
-1. 新建任务：直接说「**帮我做一份[PPT/Word/Excel]**」或「**开始策划**」，orchestrator 会问清主题/受众/篇幅/风格。
+1. 新建任务：直接说「**帮我做一份[PPT/Word/Excel]**」或「**开始策划**」，orchestrator 会问清主题/受众/篇幅/风格，**并询问是否有品牌资产（有则按品牌套件统一出品）**。
 2. 选风格：orchestrator 先问方向（稳重专业/现代高级/个性鲜明/亲和内容），再给 3-4 个具体风格选项（14 种风格：商务专业/麦肯锡/学术/极简/创意/公文 + 瑞士网格/玻璃拟态/杂志编辑/暗色科技/极光渐变/扁平插画/粗野主义/复古千禧），可参考社区来源链接。
 3. 确认 plan 后，说对应专家触发词（如「制作PPT」）即可产出文档。
 4. 修改（已交付文档）：直接说改哪里，orchestrator 会用 `send_message` 让原子代理续聊修订。
@@ -143,3 +147,13 @@ office-studio/
 ## 七、安全门禁
 
 **安全门禁通过（2026-08-23）**：全部 AGENT.md 与 knowledge/ 已通过提示注入 / 恶意指令 / 数据外泄 / 供应链投毒 / 平台安全五项审查，社区来源内容可追溯、审查结论随附。
+**安全门禁复查通过（2026-08-24，v2 品牌套件迭代后）**：新增 `shared/brand-kit.md` 与各 AGENT.md 品牌套件段落复查通过（无提示注入/恶意指令/数据外泄/密文残留），触发词登记表冻结未动。
+
+## 八、v3 PPT 能力增强（2026，调研 7 个社区 PPT 插件后提炼）
+
+> 借鉴 dsh-ppt / PPTKit Presentation / @yejiming/dsh-ppt / pptfast / pptwise / DeepSeek Design / dsh-univer-office 的**机制**（非代码），slide-designer 新增四项能力：
+
+- **视觉审稿质检**：`agents/slide-designer/scripts/visual-qa.py` 自动检测文字溢出 / 元素重叠 / 对比度不足 / 越界 / 字体缺失（`python visual-qa.py <deck.pptx>`）；`knowledge/visual-qa.md` 提供人工目检清单与自动修正规则。
+- **插件生态协同**：`knowledge/plugin-ecosystem.md` 记录 7 个社区 PPT 插件的安装命令与协同方式（本技能出叙事化初稿 → 插件做可视化精修/审稿）。
+- **主题别名映射**：`shared/style-catalog.md` 增加社区主题名 → `style_id` 映射（数据漂移→`dark-tech`、瑞士脉冲→`swiss-grid`、天鹅绒标准→`editorial-magazine` 等）。
+- **增强项**：spec 先行（渲染前落页面级规格）、HTML 预览双产物、从公司现有 PPT 抽取配色/字体并入 brand-kit。

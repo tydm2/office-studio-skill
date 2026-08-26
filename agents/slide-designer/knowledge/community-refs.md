@@ -16,3 +16,17 @@
 ## 避坑经验
 - 社区 PPT skill 多绑定私有模板/脚本，只借"叙事结构与质检清单"，不借脚本与模板文件。
 - "每页一个论点 + 信息密度受控"是提升 PPT 质量最有效的一条，比任何花哨版式都重要。
+
+## 2026 社区 PPT 插件生态（调研入库，详情见 plugin-ecosystem.md）
+
+| 来源 | 链接 | 借鉴点 | 审查结论 |
+|------|------|--------|----------|
+| STARDUSTLC666/dsh-ppt | https://github.com/STARDUSTLC666/dsh-ppt | HTML+PPTX 双产物、5 视觉主题、零依赖 | 通过（仅借鉴机制，未照搬代码） |
+| openHacking/PPTKit Presentation | cnblogs 部署指南 | deck-brief + deck-spec 中间文件，可追溯可迭代 | 通过（同上） |
+| @yejiming/dsh-ppt | https://www.npmjs.com/package/@yejiming/dsh-ppt | 原生 PPTX + 免版权配图 + 自动图表 + AI 视觉审稿 | 通过（审稿规则提炼入 visual-qa） |
+| liustack/pptfast | https://github.com/liustack/pptfast | 抽公司配色字体、可视化批注修改、语义 IR | 通过（配色抽取并入 brand-kit） |
+| liustack/pptwise | https://github.com/liustack/pptwise | 语义 IR + 24 风格 + 实时预览迭代 | 通过（IR 并入 spec 先行） |
+| iPolloWork/DeepSeek Design | https://github.com/Devin-AXIS/deepseek-design | 可视化工作台 + 选区级 Ask AI | 通过（定位下游协同） |
+| dream-num/dsh-univer-office | https://github.com/dream-num/dsh-univer-office | 在线编辑 + 溢出/重叠检测 + 导入 .pptx | 通过（检测规则提炼入 visual-qa） |
+
+> 避坑：以上仅借鉴「机制/规则」，不照搬私有模板与素材；安装第三方插件=在 harness 内运行第三方代码，需自行审查、限最小权限。
