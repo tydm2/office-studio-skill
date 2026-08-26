@@ -1,8 +1,12 @@
-# office-studio —— 办公文档多智能体工作流
+# office-studio — Multi-Agent Workflow for Office Documents
 
-> 目标平台：**DSH**（本环境）。一条流水线高效制作/编辑 **Word · PPT · Excel** 三类办公文档，成果质量优先，支持**多种风格一键切换**。
+**[English](README.md)** · [简体中文](README.zh-CN.md) · [Español](README.es.md) · [Français](README.fr.md) · [Русский](README.ru.md) · [日本語](README.ja.md)
 
-## 一、流水线图
+
+
+> Target platform: **DSH** (this environment). One pipeline for efficiently creating/editing three kinds of office documents — **Word · PPT · Excel** — with quality-first results and support for **one-click switching between multiple styles**.
+
+## I. Pipeline
 
 ```
 【新建】用户一句话（如"帮我做一份商务风PPT"）
@@ -35,18 +39,18 @@ orchestrator ──读取识别（结构/风格/内容概要）──▶ 澄清 
    交付用户 → 迭代（send_message 续聊修订）
 ```
 
-## 二、触发词映射表
+## II. Trigger-Word Mapping
 
-| 智能体 | 一句话职责 | 触发词（自然语言，含同义变体） |
+| Agent | One-line responsibility | Trigger words (natural language, including synonymous variants) |
 |--------|-----------|------------------------------|
-| **orchestrator**（大脑） | 吃需求 → 吐已选风格+自包含任务包 → 汇总交付 | 新建：`开始策划` `新建文档` `帮我做一份PPT` `帮我写一份Word` `帮我做一份Excel` `做文档`；编辑：`编辑文档` `修改文档` `改这份PPT` `改这个Word`（用户提供现有文件时优先走编辑分支） |
-| **word-crafter** | 吃 plan+风格 → 吐规范 .docx | 新建：`撰写Word` `写正文` `生成Word`；编辑：`改Word` `修改文档` `编辑这份Word` |
-| **slide-designer** | 吃 plan+风格 → 吐叙事化 .pptx | 新建：`制作PPT` `做幻灯片` `生成PPT`；编辑：`改PPT` `修改这份PPT` |
-| **sheet-analyst** | 吃数据+plan+风格 → 吐结论先行 .xlsx | 新建：`制作Excel` `做报表` `生成Excel` `分析数据`；编辑：`改Excel` `修改表格` `编辑这份Excel` |
+| **orchestrator** (Brain) | Takes a requirement → outputs the selected style + self-contained task package → aggregates delivery | New: `开始策划` `新建文档` `帮我做一份PPT` `帮我写一份Word` `帮我做一份Excel` `做文档`; Edit: `编辑文档` `修改文档` `改这份PPT` `改这个Word` (prefers the edit branch when the user provides an existing file) |
+| **word-crafter** | Takes plan + style → outputs a spec-compliant .docx | New: `撰写Word` `写正文` `生成Word`; Edit: `改Word` `修改文档` `编辑这份Word` |
+| **slide-designer** | Takes plan + style → outputs a narrative .pptx | New: `制作PPT` `做幻灯片` `生成PPT`; Edit: `改PPT` `修改这份PPT` |
+| **sheet-analyst** | Takes data + plan + style → outputs a conclusion-first .xlsx | New: `制作Excel` `做报表` `生成Excel` `分析数据`; Edit: `改Excel` `修改表格` `编辑这份Excel` |
 
-**触发规则**：新任务（无对应 plan 存档）一律先进 `orchestrator` 澄清；`plan-NN.md` 经用户确认后，用各专家专属触发词直达。触发词互不冲突，也不与系统内置命令冲突。
+**Trigger rules**: New tasks (no corresponding plan archive) always enter `orchestrator` first for clarification; after `plan-NN.md` is confirmed by the user, use each expert's dedicated trigger words to go directly. Trigger words do not conflict with one another, nor with built-in system commands.
 
-## 三、目录结构
+## III. Directory Structure
 
 ```
 office-studio/
@@ -84,76 +88,77 @@ office-studio/
     excel/                       # sheet-NN.xlsx + sheet-NN-meta.md
 ```
 
-## 四、文件契约（上游产出 → 下游读取）
+## IV. File Contracts (upstream output → downstream reads)
 
-1. **策划 → 各专家（新建）**：`outputs/plans/plan-NN.md`，头部元信息格式固定：
+1. **Planning → each expert (new)**: `outputs/plans/plan-NN.md`, with a fixed header metadata format:
    ```yaml
    ---
    doc_id: plan-NN
-   title: <标题>
+   title: <title>
    doc_type: word | ppt | excel
-   style_id: <见 shared/style-catalog.md，14 种：6 经典 + 8 社区借鉴；选择器见 shared/style-switcher.md>
-   brand_kit: <可选，用户提供品牌资产时写 brand-NN，规则见 shared/brand-kit.md；无则省略>
-   audience: <受众>
-   purpose: <用途>
-   length: <篇幅>
-   data_source: <可选，Excel 数据文件路径>
+   style_id: <see shared/style-catalog.md — 14 styles: 6 classic + 8 community-inspired; selector in shared/style-switcher.md>
+   brand_kit: <optional; write brand-NN when the user provides brand assets, rules in shared/brand-kit.md; omit if none>
+   audience: <audience>
+   purpose: <purpose>
+   length: <length>
+   data_source: <optional, Excel data file path>
    ---
    ```
-1b. **编辑任务 → 各专家（编辑）**：`outputs/plans/edit-NN.md`：
+1b. **Edit task → each expert (edit)**: `outputs/plans/edit-NN.md`:
    ```yaml
    ---
    doc_id: edit-NN
-   source_file: <原文档路径，用户拖入/提供>
+   source_file: <original document path, provided/dragged in by the user>
    doc_type: word | ppt | excel
    mode: edit
-   change_request: <修改要求，具体到段落/页面/单元格>
-   keep: <必须保留项：原格式/已有结论/数据>
-   style_id: <默认沿用原风格；换风格需用户明确指定>
+   change_request: <change request, specific to paragraph/page/cell>
+   keep: <must-keep items: original format / existing conclusions / data>
+   style_id: <defaults to the original style; switching styles requires explicit user specification>
    ---
    ```
-2. **各专家产出**：`outputs/<type>/<文件名>`，并附带同名 `-meta.md`（记录：doc_id、style_id、**brand_kit（若有）**、生成日期、数据来源、改动说明）。
-3. **迭代**：用户修改意见一律通过 DSH `send_message` 给原子代理续聊修订，保留上下文；修订必须写进 `-meta.md` 的「改动说明」，不静默重写已确认内容。
-4. **品牌套件（v2）**：用户提供品牌资产（品牌色/Logo/字体/模板）→ orchestrator 收集进 `shared/brand-kit.md`，plan 写 `brand_kit: brand-NN`，三专家统一套用（品牌优先于风格库）；同一 brand_id 多件套交付时 orchestrator 核对品牌一致性（见 `shared/brand-kit.md`）。
+2. **Each expert's output**: `outputs/<type>/<filename>`, accompanied by a same-named `-meta.md` (recording: doc_id, style_id, **brand_kit (if any)**, generation date, data source, change notes).
+3. **Iteration**: All user revision comments go through DSH `send_message` to continue the atomic agent's conversation for revision, preserving context; revisions must be written into the "change notes" of `-meta.md`, never silently rewriting confirmed content.
+4. **Brand kit (v2)**: When the user provides brand assets (brand colors / Logo / fonts / templates) → orchestrator collects them into `shared/brand-kit.md`, the plan writes `brand_kit: brand-NN`, and all three experts apply them uniformly (brand takes priority over the style catalog); when delivering multiple documents under the same brand_id, orchestrator verifies brand consistency (see `shared/brand-kit.md`).
 
-## 五、社区先例致谢（设计参考）
+## V. Community Credits (design references)
 
-| 来源 | 借鉴点 |
+| Source | Borrowed points |
 |------|--------|
-| [anthropics/skills](https://github.com/anthropics/skills)（官方） | docx/pptx/xlsx「先读现有文件→生成→校验可打开」范式 |
-| [johnson7788/skill-ppt-agents](https://github.com/johnson7788/skill-ppt-agents) + [MultiAgentPPT](https://github.com/johnson7788/MultiAgentPPT) | PPT「大纲→内容→设计」多阶段、每阶段独立验收 |
-| [rafalozan0/DocFlow](https://github.com/rafalozan0/DocFlow-Presentations-and-Docs-Skill) | 三件套统一 python-pptx/docx/openpyxl + 文件化模板目录（多风格切换） |
-| [cabbage2000-lab/data-analysis-skills](https://github.com/cabbage2000-lab/data-analysis-skills) | Excel 结论先行六段式、数据可追溯、不杜撰、相关≠因果 |
-| [fleurytian/awesome-claude-skills](https://github.com/fleurytian/awesome-claude-skills)（前麦肯锡） | 金字塔原理 / MECE 叙事结构 |
-| [hugohe3/ppt-master](https://github.com/hugohe3/ppt-master)（风格规格仓库） | 瑞士网格风等设计规格 → 入库为 `swiss-grid` 风格 |
-| [corazzon/pptx-design-styles](https://github.com/corazzon/pptx-design-styles) / [sunchaokun/PPT-Design-Skill](https://github.com/sunchaokun/PPT-Design-Skill) / [GordenSun/GordenPPTSkill](https://github.com/GordenSun/GordenPPTSkill) | 社区 PPT 风格体系与模板实践调研（仅借鉴风格规格，不搬模板） |
-| [SlideRabbit 2025 设计趋势](https://sliderabbit.com/blog/inspiring-2025-presentation-design-trends/) 等 | 粗野主义/Y2K/渐变等趋势 → 入库为 `brutalist` / `retro-y2k` / `aurora-gradient` |
-| [Storyset](https://storyset.com/) / [unDraw](https://undraw.co/) / [manypixels](https://www.manypixels.co/gallery) | 免费扁平插画生态 → `flat-illustration` 风格与生图映射参考 |
+| [anthropics/skills](https://github.com/anthropics/skills) (official) | The docx/pptx/xlsx "read existing file → generate → verify openable" paradigm |
+| [johnson7788/skill-ppt-agents](https://github.com/johnson7788/skill-ppt-agents) + [MultiAgentPPT](https://github.com/johnson7788/MultiAgentPPT) | PPT "outline → content → design" multi-stage, with independent acceptance at each stage |
+| [rafalozan0/DocFlow](https://github.com/rafalozan0/DocFlow-Presentations-and-Docs-Skill) | Unified python-pptx/docx/openpyxl for the trio + file-based template directory (multi-style switching) |
+| [cabbage2000-lab/data-analysis-skills](https://github.com/cabbage2000-lab/data-analysis-skills) | Excel conclusion-first six-paragraph structure, traceable data, no fabrication, correlation ≠ causation |
+| [fleurytian/awesome-claude-skills](https://github.com/fleurytian/awesome-claude-skills) (ex-McKinsey) | Pyramid Principle / MECE narrative structure |
+| [hugohe3/ppt-master](https://github.com/hugohe3/ppt-master) (style spec repository) | Swiss Grid style and other design specs → stored as the `swiss-grid` style |
+| [corazzon/pptx-design-styles](https://github.com/corazzon/pptx-design-styles) / [sunchaokun/PPT-Design-Skill](https://github.com/sunchaokun/PPT-Design-Skill) / [GordenSun/GordenPPTSkill](https://github.com/GordenSun/GordenPPTSkill) | Research on community PPT style systems and template practice (only borrowing style specs, not copying templates) |
+| [SlideRabbit 2025 design trends](https://sliderabbit.com/blog/inspiring-2025-presentation-design-trends/) and others | Brutalism / Y2K / gradient trends → stored as `brutalist` / `retro-y2k` / `aurora-gradient` |
+| [Storyset](https://storyset.com/) / [unDraw](https://undraw.co/) / [manypixels](https://www.manypixels.co/gallery) | Free flat-illustration ecosystem → `flat-illustration` style and image-generation mapping reference |
 
-以上来源均通过安全健康审查（提示注入/恶意指令/数据外泄/版权许可/活跃健康，2026-08-24），仅提炼精华、适配改写后入库，未整段照搬；风格库条目均注明来源链接。
+All of the above sources passed security and health review (prompt injection / malicious instructions / data exfiltration / copyright licensing / active health, 2026-08-24); only the essence was extracted, adapted, and rewritten into the library, with no verbatim copying; style catalog entries all cite source links.
 
-## 五·五、Blueprint 复用
-已有 blueprint：**办公文档**（`blueprints/办公文档.md`，含拓扑图/智能体清单/ADR 决策记录/社区可复用零件/避坑经验）。同类需求（文档类多智能体工作流）可说「**复用 办公文档 拓扑**」——只澄清差异，不重新设计；迭代改动同步回写 blueprint 与本文档。
+## V·5 Blueprint Reuse
 
-## 六、首跑指令
+Existing blueprint: **办公文档** (`blueprints/办公文档.md`, containing the topology diagram / agent list / ADR decision records / community reusable parts / lessons learned). For similar needs (document-type multi-agent workflows), you can say 「**复用 办公文档 拓扑**」 — only clarify differences, no redesign; iterative changes are written back to both the blueprint and this document.
 
-1. 新建任务：直接说「**帮我做一份[PPT/Word/Excel]**」或「**开始策划**」，orchestrator 会问清主题/受众/篇幅/风格，**并询问是否有品牌资产（有则按品牌套件统一出品）**。
-2. 选风格：orchestrator 先问方向（稳重专业/现代高级/个性鲜明/亲和内容），再给 3-4 个具体风格选项（14 种风格：商务专业/麦肯锡/学术/极简/创意/公文 + 瑞士网格/玻璃拟态/杂志编辑/暗色科技/极光渐变/扁平插画/粗野主义/复古千禧），可参考社区来源链接。
-3. 确认 plan 后，说对应专家触发词（如「制作PPT」）即可产出文档。
-4. 修改（已交付文档）：直接说改哪里，orchestrator 会用 `send_message` 让原子代理续聊修订。
-5. **风格不满意？换一轮**：直接说「换一种风格/风格不满意/换个风格重做」——内容结构全部保留，orchestrator 重新给风格选项，出新 plan 换 `style_id` 重做，新文件不覆盖旧文件，交付时附新旧风格对比。建议最多连续 3 轮，之后转细节微调或提供参考图。
-6. **编辑现有文档**：把 .docx/.pptx/.xlsx 路径发给我（或拖入），说「**改这个Word / 改这份PPT / 修改表格** + 要改什么」，orchestrator 会先识别原文档结构/风格，再让专家增量修改，交付时附逐条改动清单，原文件不覆盖。
+## VI. First-Run Instructions
 
-## 七、安全门禁
+1. New task: just say 「**帮我做一份[PPT/Word/Excel]**」 or 「**开始策划**」, and orchestrator will ask about topic / audience / length / style, **and ask whether there are brand assets (if so, produce uniformly per the brand kit)**.
+2. Choose style: orchestrator first asks for a direction (steady-professional / modern-premium / distinctive-personality / friendly-content), then offers 3–4 specific style options (14 styles: Business Professional / McKinsey / Academic / Minimal / Creative / Official + Swiss Grid / Glassmorphism / Magazine Editorial / Dark Tech / Aurora Gradient / Flat Illustration / Brutalist / Retro Y2K), with community source links for reference.
+3. After confirming the plan, say the corresponding expert trigger word (e.g. 「制作PPT」) to produce the document.
+4. Modify (an already-delivered document): just say what to change, and orchestrator will use `send_message` to have the atomic agent continue the conversation for revision.
+5. **Not satisfied with the style? Switch a round**: just say 「换一种风格/风格不满意/换个风格重做」 — content and structure are fully preserved, orchestrator re-offers style options, produces a new plan with a new `style_id` and redoes it, the new file does not overwrite the old one, and delivery includes a before/after style comparison. Recommend at most 3 consecutive rounds, then switch to detail fine-tuning or provide a reference image.
+6. **Edit an existing document**: send me the .docx/.pptx/.xlsx path (or drag it in) and say 「**改这个Word / 改这份PPT / 修改表格** + what to change」, orchestrator first identifies the original document's structure/style, then has the expert make incremental changes, and delivery includes an itemized change list without overwriting the original file.
 
-**安全门禁通过（2026-08-23）**：全部 AGENT.md 与 knowledge/ 已通过提示注入 / 恶意指令 / 数据外泄 / 供应链投毒 / 平台安全五项审查，社区来源内容可追溯、审查结论随附。
-**安全门禁复查通过（2026-08-24，v2 品牌套件迭代后）**：新增 `shared/brand-kit.md` 与各 AGENT.md 品牌套件段落复查通过（无提示注入/恶意指令/数据外泄/密文残留），触发词登记表冻结未动。
+## VII. Security Gate
 
-## 八、v3 PPT 能力增强（2026，调研 7 个社区 PPT 插件后提炼）
+**Security gate passed (2026-08-23)**: All AGENT.md files and knowledge/ passed five reviews — prompt injection / malicious instructions / data exfiltration / supply-chain poisoning / platform security; community source content is traceable, with review conclusions attached.
+**Security gate re-review passed (2026-08-24, after the v2 brand-kit iteration)**: The newly added `shared/brand-kit.md` and the brand-kit sections of each AGENT.md passed re-review (no prompt injection / malicious instructions / data exfiltration / credential residue), and the trigger-word registry was frozen unchanged.
 
-> 借鉴 dsh-ppt / PPTKit Presentation / @yejiming/dsh-ppt / pptfast / pptwise / DeepSeek Design / dsh-univer-office 的**机制**（非代码），slide-designer 新增四项能力：
+## VIII. v3 PPT Capability Enhancements (2026, distilled after researching 7 community PPT plugins)
 
-- **视觉审稿质检**：`agents/slide-designer/scripts/visual-qa.py` 自动检测文字溢出 / 元素重叠 / 对比度不足 / 越界 / 字体缺失（`python visual-qa.py <deck.pptx>`）；`knowledge/visual-qa.md` 提供人工目检清单与自动修正规则。
-- **插件生态协同**：`knowledge/plugin-ecosystem.md` 记录 7 个社区 PPT 插件的安装命令与协同方式（本技能出叙事化初稿 → 插件做可视化精修/审稿）。
-- **主题别名映射**：`shared/style-catalog.md` 增加社区主题名 → `style_id` 映射（数据漂移→`dark-tech`、瑞士脉冲→`swiss-grid`、天鹅绒标准→`editorial-magazine` 等）。
-- **增强项**：spec 先行（渲染前落页面级规格）、HTML 预览双产物、从公司现有 PPT 抽取配色/字体并入 brand-kit。
+> Borrowing the **mechanisms** (not the code) of dsh-ppt / PPTKit Presentation / @yejiming/dsh-ppt / pptfast / pptwise / DeepSeek Design / dsh-univer-office, slide-designer adds four capabilities:
+
+- **Visual review QA**: `agents/slide-designer/scripts/visual-qa.py` automatically detects text overflow / element overlap / insufficient contrast / out-of-bounds / missing fonts (`python visual-qa.py <deck.pptx>`); `knowledge/visual-qa.md` provides a manual inspection checklist and auto-fix rules.
+- **Plugin ecosystem collaboration**: `knowledge/plugin-ecosystem.md` records the install commands and collaboration modes of 7 community PPT plugins (this skill produces the narrative first draft → plugins handle visualization refinement / review).
+- **Theme alias mapping**: `shared/style-catalog.md` adds mappings from community theme names to `style_id` (Data Drift→`dark-tech`, Swiss Pulse→`swiss-grid`, Velvet Standard→`editorial-magazine`, etc.).
+- **Enhancements**: spec-first (page-level specs finalized before rendering), dual HTML-preview artifacts, extracting colors/fonts from the company's existing PPTs into the brand-kit.
